@@ -83,69 +83,76 @@ _Reason:_
 
 #### Files the agent must read before starting its reasoning:
 ```
-project-root/
-│
-├── README.md                     # Project overview
-├── package.json                  # Frontend dependencies
-├── tailwind.config.js            # Tailwind setup
-├── next.config.js                # Next.js config
-├── pyproject.toml / requirements.txt  # Backend dependencies
-├── .env                          # Environment variables
+/ocp
+├── README.md                     # Main project overview & quickstart
+├── .env                          # Environment variables (backend + frontend)
+├── .gitignore                    # Git ignore rules
+├── .envrc                        # direnv config (loads Nix environment)
+├── flake.nix                     # Nix development environment definition
+├── flake.lock                    # Locked Nix dependency versions
 │
 ├── /.opencode
 │   ├── /context
-│   │   └── opencode.md           # Full project spec for agent reasoning
+│   │   └── opencode.md           # Full project spec for the Opencode agent
 │   └── /docs
-│   │   ├── architecture.md       # Architecture diagrams + flow
-│   │   ├── workflows.md          # Step-by-step workflows
-│   │   └── guides.md             # Setup and developer guides
+│       ├── ARCHITECTURE.md       # System architecture & data flow
+│       ├── PRD.md                # Product requirements document
+│       └── opencode_sdk.md       # Guide for using the Opencode SDK
 │
-├── /src
-│   ├── /app                      # Next.js App Router pages
-│   │   ├── /dashboard            # Dashboard pages and components
-│   │   ├── /chat                 # Chat interface components
-│   │   └── /settings             # User settings and permissions
-│   │   └── /Workspace            # User workspace area
-│   │
-│   ├── /components               # Reusable UI components
-│   ├── /hooks                    # React hooks
-│   ├── /layouts                  # Layouts for dashboard / chat / pages
-│   ├── /lib                      # Utilities, API clients (Supabase, ML API, Opencode)
-│   └── /styles                   # Tailwind + global styles
+├── /.direnv
+│   ├── bin/                      # Helper scripts for direnv
+│   ├── flake-inputs/             # Downloaded Nix dependencies
+│   ├── flake-profile-*           # Cached Nix build profiles
+│   └── flake-profile-*.rc        # Runtime config for Nix environment
 │
 ├── /backend
-│   ├── /api                      # FastAPI routes
-│   ├── /services                 # Business logic (ML triggers, notifications)
-│   ├── /models                   # ML model definitions
-│   ├── /schemas                  # Pydantic schemas for API requests/responses
-│   ├── /workers                  # Background jobs, scheduled tasks
-│   └── main.py                   # FastAPI entrypoint
-│
-├── /ml
-│   ├── /models                   # Energy optimization models
-│   ├── /preprocessing            # Data cleaning, transformation scripts
-│   ├── /training                 # Training scripts
-│   └── /evaluation               # Evaluation scripts / metrics
-│
-├── /agents
-│   ├── /instructions             # Agent prompt templates
-│   ├── /tools                    # Custom LLM tools / command definitions
-│   └── /schemas                  # Agent input/output schemas
+│   ├── README.md                 # Backend overview and usage
+│   ├── main.py                   # FastAPI application entrypoint
+│   │
+│   ├── /api                      # FastAPI route definitions (endpoints)
+│   │   └── README.md
+│   ├── /services                 # Business logic (ML triggers, workflows)
+│   │   └── README.md
+│   ├── /models                   # Database/ML models
+│   │   └── README.md
+│   ├── /schemas                  # Pydantic request/response schemas
+│   │   └── README.md
+│   └── /workers                  # Background jobs (async tasks, scheduling)
+│       └── README.md
 │
 ├── /config
-│   ├── supabase.js / ts          # Supabase client setup
-│   ├── db.js / ts                # Database client
-│   ├── ml_config.yaml            # ML hyperparameters
-│   └── notifications.js          # Notification settings / API keys
+│   └── README.md                 # Configuration docs (DB, ML, API, env)
 │
-├── /tests
-│   ├── /frontend                 # Jest / RTL tests
-│   ├── /backend                  # Pytest tests
-│   ├── /ml                       # Model unit tests
-│   └── /integration              # Full-stack integration tests
+├── /ml
+│   └── README.md                 # Machine learning module overview
 │
-└── /scripts
-
-
+├── /scripts
+│   └── README.md                 # Dev scripts (setup, tooling, automation)
+│
+├── /src                          # Frontend (Next.js 14 App Router)
+│   ├── /app                      # Application routes
+│   │   ├── README.md
+│   │   ├── /dashboard            # Dashboard pages & components
+│   │   │   └── README.md
+│   │   ├── /chat                 # Chat UI & real-time components
+│   │   │   └── README.md
+│   │   ├── /settings             # User settings pages & permissions UI
+│   │   │   └── README.md
+│   │   └── /Workspace            # User workspace: saved charts, notes, assets
+│   │       └── README.md
+│   │
+│   ├── /components               # Global reusable UI components
+│   │   └── README.md
+│   ├── /hooks                    # Custom React hooks
+│   │   └── README.md
+│   ├── /layouts                  # Page and dashboard layouts
+│   │   └── README.md
+│   ├── /lib                      # Frontend utilities & API facades
+│   │   └── README.md
+│   └── /styles                   # Tailwind/global styling
+│       └── README.md
+│
+└── /tests
+    └── README.md                 # Test structure overview (unit, integration)
 ```
-
+---
