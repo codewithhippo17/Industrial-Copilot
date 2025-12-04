@@ -144,8 +144,7 @@ export default function DashboardPage() {
   };
 
   const handleWorkspaceNavigation = () => {
-    console.log('Navigate to Workspace');
-    // TODO: Implement workspace navigation
+    window.location.href = '/workspace';
   };
 
   const handleSettingsNavigation = () => {

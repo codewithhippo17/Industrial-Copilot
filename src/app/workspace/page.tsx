@@ -110,7 +110,7 @@ const WorkspaceSidebar: React.FC<{
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-semibold text-[#313647]">Folders</h3>
           <button className="p-1 hover:bg-[#A3B087]/10 rounded">
-            <Icon name="plus" size={16} color="accent" />
+            <Icon name="add" size={16} color="accent" />
           </button>
         </div>
         
@@ -152,7 +152,7 @@ const WorkspaceSidebar: React.FC<{
                   : 'text-[#435663] hover:bg-[#435663]/5'
               }`}
             >
-              <Icon name="file-plus" size={16} color={selectedFolder === folder.id ? 'accent' : 'secondary'} />
+              <Icon name="files" size={16} color={selectedFolder === folder.id ? 'accent' : 'secondary'} />
               <span>{folder.name}</span>
               <span className="ml-auto text-xs text-[#435663]/60">{folder.items_count}</span>
             </button>
@@ -167,7 +167,7 @@ const WorkspaceSidebar: React.FC<{
           {[
             { name: 'Charts', count: 45, icon: 'dashboard-tab' },
             { name: 'Visualizations', count: 28, icon: 'share' },
-            { name: 'Datasets', count: 34, icon: 'file-plus' },
+            { name: 'Datasets', count: 34, icon: 'files' },
             { name: 'Templates', count: 19, icon: 'copy' },
             { name: 'Notebooks', count: 16, icon: 'commands' }
           ].map((category) => (
@@ -199,10 +199,10 @@ const WorkspaceItemCard: React.FC<{
     switch (type) {
       case 'chart': return 'dashboard-tab';
       case 'visualization': return 'share';
-      case 'dataset': return 'file-plus';
+      case 'dataset': return 'files';
       case 'template': return 'copy';
       case 'notebook': return 'commands';
-      default: return 'file-plus';
+      default: return 'files';
     }
   };
 
@@ -351,13 +351,13 @@ const WorkspaceContent: React.FC<{
                     : 'text-[#435663] hover:bg-[#435663]/5'
                 }`}
               >
-                <Icon name="menu" size={16} color={viewMode === 'list' ? 'inverse' : 'secondary'} />
+                <Icon name="hamburger-menu" size={16} color={viewMode === 'list' ? 'inverse' : 'secondary'} />
               </button>
             </div>
             
             {/* New item button */}
             <button className="flex items-center gap-2 px-4 py-2 bg-[#A3B087] text-white rounded-lg font-medium hover:bg-[#A3B087]/90 transition-colors">
-              <Icon name="plus" size={16} color="inverse" />
+              <Icon name="add" size={16} color="inverse" />
               <span>New Item</span>
             </button>
           </div>
@@ -378,11 +378,11 @@ const WorkspaceContent: React.FC<{
             
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <button className="flex items-center gap-2 px-6 py-3 bg-[#A3B087] text-white rounded-lg font-medium hover:bg-[#A3B087]/90 transition-colors">
-                <Icon name="plus" size={20} color="inverse" />
+                <Icon name="add" size={20} color="inverse" />
                 <span>Create Chart</span>
               </button>
               <button className="flex items-center gap-2 px-6 py-3 border border-[#A3B087] text-[#A3B087] rounded-lg font-medium hover:bg-[#A3B087]/5 transition-colors">
-                <Icon name="upload-files" size={20} color="accent" />
+                <Icon name="upload" size={20} color="accent" />
                 <span>Import Data</span>
               </button>
             </div>
