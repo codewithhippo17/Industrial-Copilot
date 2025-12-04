@@ -27,24 +27,38 @@ interface ChatState {
  * Enhanced Header Bar Component with improved interactions and mobile responsiveness
  */
 export const ChatHeader: React.FC<{ 
-  onSidebarToggle?: () => void;
+  onDashboard?: () => void;
+  onWorkspace?: () => void;
   onSettings?: () => void;
-}> = ({ onSidebarToggle, onSettings }) => {
+}> = ({ onDashboard, onWorkspace, onSettings }) => {
   return (
     <header className="flex items-center justify-between px-4 py-2.5 bg-[#313647] text-[#FFF8D4] shadow-sm border-b border-[#435663]">
       <div className="flex items-center gap-3">
-        <button 
-          onClick={onSidebarToggle}
-          className="p-1.5 rounded-md hover:bg-[#435663] transition-colors"
-          aria-label="Toggle sidebar"
-        >
-          <Icon name="hamburger-menu" size={20} color="inverse" />
-        </button>
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 bg-[#A3B087] rounded-full flex items-center justify-center">
             <Icon name="agent-selector" size={16} color="inverse" />
           </div>
           <span className="text-base font-semibold">OCP Chat</span>
+        </div>
+        
+        {/* Dashboard and Workspaces buttons */}
+        <div className="flex items-center gap-1">
+          <button 
+            onClick={onDashboard}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors rounded-lg text-[#FFF8D4] hover:bg-[#435663] hover:text-white"
+            aria-label="Dashboard"
+          >
+            <Icon name="dashboard-tab" size={16} color="inverse" />
+            <span>Dashboard</span>
+          </button>
+          <button 
+            onClick={onWorkspace}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors rounded-lg text-[#FFF8D4] hover:bg-[#435663] hover:text-white"
+            aria-label="Workspace"
+          >
+            <Icon name="workspace" size={16} color="inverse" />
+            <span>Workspace</span>
+          </button>
         </div>
       </div>
       
@@ -732,15 +746,22 @@ export const ChatUIDemo: React.FC = () => {
   };
 
   const handleSettings = () => {
-    // TODO: Implement settings modal/drawer
-    console.log('Settings clicked - implement settings modal');
     alert('Settings functionality will be implemented here');
+  };
+
+  const handleDashboard = () => {
+    alert('Dashboard navigation functionality will be implemented here');
+  };
+
+  const handleWorkspace = () => {
+    alert('Workspace navigation functionality will be implemented here');
   };
 
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-[#FFF8D4] to-[#F3F4F6]">
       <ChatHeader 
-        onSidebarToggle={() => setSidebarOpen(!sidebarOpen)} 
+        onDashboard={handleDashboard}
+        onWorkspace={handleWorkspace}
         onSettings={handleSettings}
       />
 
