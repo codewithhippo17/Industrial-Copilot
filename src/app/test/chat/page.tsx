@@ -5,16 +5,7 @@ import { Icon } from '@/components/ui';
 export default function ChatTestPage() {
   return (
     <div className="min-h-screen">
-      {/* Test Navigation */}
-      <div className="fixed top-4 left-4 z-50">
-        <Link 
-          href="/" 
-          className="flex items-center gap-2 px-3 py-2 bg-white/90 backdrop-blur-sm rounded-md shadow-md text-primary-dark hover:bg-primary-light hover:text-white transition-colors"
-        >
-          <Icon name="hamburger-menu" size={16} />
-          <span className="text-sm font-medium">Exit Test</span>
-        </Link>
-      </div>
+
       
       {/* Full Chat UI Demo */}
       <ChatUIDemo />
