@@ -145,7 +145,7 @@ export const ChatSidebar: React.FC<{
           className="p-1.5 rounded-md hover:bg-[#435663] transition-colors"
           aria-label="Collapse sidebar"
         >
-          <Icon name="workspace" size={16} color="inverse" />
+          <Icon name="sidebar" size={16} color="inverse" />
         </button>
       </div>
 
