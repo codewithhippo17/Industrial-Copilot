@@ -141,43 +141,93 @@ export const ChatHeader: React.FC<{
 
 
 /**
- * Example Sidebar Component with mobile improvements
- * Based on Web Chat UI Specification sidebar design
+ * Enhanced Sidebar Component with OpenCode Session Management
+ * Displays real sessions from OpenCode API with selection, deletion, and refresh
  */
 export const ChatSidebar: React.FC<{ 
   onNewChat?: () => void;
   onCollapse?: () => void;
-}> = ({ onNewChat, onCollapse }) => {
-  const recentChats = [
-    { id: 1, title: 'Q3 Energy Analysis', active: false },
-    { id: 2, title: 'Sales Visualization', active: true },
-    { id: 3, title: 'Dashboard Help', active: false },
-  ];
+  sessions?: OCPSession[];
+  currentSessionId?: string;
+  onSessionSelect?: (session: OCPSession) => void;
+  onSessionDelete?: (sessionId: string) => void;
+  onRefresh?: () => void;
+}> = ({ 
+  onNewChat, 
+  onCollapse, 
+  sessions = [], 
+  currentSessionId,
+  onSessionSelect,
+  onSessionDelete,
+  onRefresh
+}) => {
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+
+  const handleSessionClick = (session: OCPSession) => {
+    if (onSessionSelect) {
+      onSessionSelect(session);
+    }
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent, sessionId: string) => {
+    e.stopPropagation();
+    setDeleteConfirm(sessionId);
+  };
+
+  const confirmDelete = async (sessionId: string) => {
+    if (onSessionDelete) {
+      await onSessionDelete(sessionId);
+    }
+    setDeleteConfirm(null);
+  };
+
+  const cancelDelete = () => {
+    setDeleteConfirm(null);
+  };
 
   return (
-    <aside className="w-64 bg-[#313647] border-r border-[#435663] p-4 h-full overflow-y-auto">
+    <aside className="w-64 bg-[#313647] border-r border-[#435663] p-4 h-full overflow-y-auto flex flex-col">
       {/* Desktop header with collapse button */}
       <div className="hidden md:flex items-center justify-between mb-4 pb-2 border-b border-[#435663]">
         <h2 className="text-lg font-semibold text-[#FFF8D4]">Chat History</h2>
-        <button 
-          onClick={onCollapse}
-          className="p-1.5 rounded-md hover:bg-[#435663] transition-colors"
-          aria-label="Collapse sidebar"
-        >
-          <Icon name="sidebar" size={16} color="inverse" />
-        </button>
+        <div className="flex items-center gap-1">
+          <button 
+            onClick={onRefresh}
+            className="p-1.5 rounded-md hover:bg-[#435663] transition-colors"
+            aria-label="Refresh sessions"
+            title="Refresh sessions"
+          >
+            <Icon name="search" size={16} color="inverse" />
+          </button>
+          <button 
+            onClick={onCollapse}
+            className="p-1.5 rounded-md hover:bg-[#435663] transition-colors"
+            aria-label="Collapse sidebar"
+          >
+            <Icon name="sidebar" size={16} color="inverse" />
+          </button>
+        </div>
       </div>
 
       {/* Mobile header with close button */}
       <div className="md:hidden flex items-center justify-between mb-4 pb-2 border-b border-[#435663]">
         <h2 className="text-lg font-semibold text-[#FFF8D4]">Chat History</h2>
-        <button 
-          onClick={onCollapse}
-          className="p-1.5 rounded-md hover:bg-[#435663] transition-colors"
-          aria-label="Close sidebar"
-        >
-          <Icon name="minus" size={16} color="inverse" />
-        </button>
+        <div className="flex items-center gap-1">
+          <button 
+            onClick={onRefresh}
+            className="p-1.5 rounded-md hover:bg-[#435663] transition-colors"
+            aria-label="Refresh sessions"
+          >
+            <Icon name="search" size={16} color="inverse" />
+          </button>
+          <button 
+            onClick={onCollapse}
+            className="p-1.5 rounded-md hover:bg-[#435663] transition-colors"
+            aria-label="Close sidebar"
+          >
+            <Icon name="minus" size={16} color="inverse" />
+          </button>
+        </div>
       </div>
 
       <div className="mb-6">
@@ -190,32 +240,74 @@ export const ChatSidebar: React.FC<{
         </button>
       </div>
       
-      <div>
-        <h3 className="text-sm font-semibold text-[#FFF8D4] mb-3">Recent Chats</h3>
+      <div className="flex-1 overflow-y-auto">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-semibold text-[#FFF8D4]">
+            Recent Chats ({sessions.length})
+          </h3>
+        </div>
         <div className="space-y-1">
-          {recentChats.map((chat) => (
-            <button
-              key={chat.id}
-              className={`flex items-center gap-2 w-full px-4 py-2 text-sm font-medium transition-colors rounded-lg text-left group ${
-                chat.active 
-                  ? 'bg-[#A3B087] text-white' 
-                  : 'text-[#FFF8D4] hover:bg-[#435663] hover:text-white'
-              }`}
-            >
-              <Icon 
-                name="dot" 
-                size={16} 
-                color={chat.active ? 'inverse' : 'inverse'} 
-              />
-              <span className="truncate flex-1">{chat.title}</span>
-              <Icon 
-                name="chat-options" 
-                size={16}
-                color={chat.active ? 'inverse' : 'inverse'}
-                className="opacity-0 group-hover:opacity-100 flex-shrink-0"
-              />
-            </button>
-          ))}
+          {sessions.length === 0 ? (
+            <div className="text-center py-8 text-[#FFF8D4] opacity-60 text-sm">
+              No sessions yet. Start a new chat!
+            </div>
+          ) : (
+            sessions.map((session) => {
+              const isActive = session.id === currentSessionId;
+              const isDeleting = deleteConfirm === session.id;
+              
+              return (
+                <div key={session.id} className="relative">
+                  {isDeleting ? (
+                    <div className="flex items-center gap-2 w-full px-4 py-2 text-xs bg-red-500 text-white rounded-lg">
+                      <span className="flex-1">Delete this chat?</span>
+                      <button
+                        onClick={() => confirmDelete(session.id)}
+                        className="px-2 py-1 bg-white text-red-500 rounded hover:bg-gray-100 font-medium"
+                      >
+                        Yes
+                      </button>
+                      <button
+                        onClick={cancelDelete}
+                        className="px-2 py-1 bg-red-700 text-white rounded hover:bg-red-800"
+                      >
+                        No
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => handleSessionClick(session)}
+                      className={`flex items-center gap-2 w-full px-4 py-2 text-sm font-medium transition-colors rounded-lg text-left group ${
+                        isActive 
+                          ? 'bg-[#A3B087] text-white' 
+                          : 'text-[#FFF8D4] hover:bg-[#435663] hover:text-white'
+                      }`}
+                    >
+                      <Icon 
+                        name="dot" 
+                        size={16} 
+                        color="inverse" 
+                      />
+                      <span className="truncate flex-1" title={session.title}>
+                        {session.title || 'Untitled Chat'}
+                      </span>
+                      <button
+                        onClick={(e) => handleDeleteClick(e, session.id)}
+                        className="opacity-0 group-hover:opacity-100 flex-shrink-0 hover:text-red-400 transition-opacity"
+                        aria-label="Delete session"
+                      >
+                        <Icon 
+                          name="minus" 
+                          size={16}
+                          color="inverse"
+                        />
+                      </button>
+                    </button>
+                  )}
+                </div>
+              );
+            })
+          )}
         </div>
       </div>
     </aside>
@@ -669,17 +761,19 @@ export const ChatUIDemo: React.FC = () => {
       try {
         setChatState(prev => ({ ...prev, connectionStatus: 'connecting' }));
         
-        // Test connection to OpenCode server using direct fetch
-        const baseUrl = "https://analyst-skirts-resolved-moved.trycloudflare.com";
-          
-        const response = await fetch(`${baseUrl}/config`);
+        // Test connection to OpenCode server
+        const config = await opcClient.config.get();
         
-        if (response.ok) {
+        if (config.data) {
           setChatState(prev => ({ ...prev, connectionStatus: 'connected' }));
-          // Auto-create first session
+          
+          // Load all existing sessions
+          await loadAllSessions();
+          
+          // Auto-create first session if no sessions exist
           await handleNewChat();
         } else {
-          throw new Error(`Config endpoint returned ${response.status}`);
+          throw new Error('Failed to get config from OpenCode server');
         }
       } catch (error) {
         console.error('Connection failed:', error);
@@ -693,23 +787,18 @@ export const ChatUIDemo: React.FC = () => {
   // OpenCode session management functions
   const createNewSession = async (): Promise<OCPSession | null> => {
     try {
-      const baseUrl = "https://analyst-skirts-resolved-moved.trycloudflare.com";
-        
-      const response = await fetch(`${baseUrl}/session`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: `OCP Chat ${new Date().toLocaleString()}` })
+      const session = await opcClient.session.create({
+        body: { title: `OCP Chat ${new Date().toLocaleString()}` }
       });
       
-      if (response.ok) {
-        const sessionData = await response.json();
+      if (session.data) {
         return {
-          ...sessionData,
-          title: sessionData.title || 'New Chat',
+          ...session.data,
+          title: session.data.title || 'New Chat',
           lastActivity: new Date()
         };
       } else {
-        throw new Error(`Session creation failed: ${response.status}`);
+        throw new Error('Session creation returned no data');
       }
     } catch (error) {
       console.error('Failed to create session:', error);
@@ -877,9 +966,11 @@ export const ChatUIDemo: React.FC = () => {
   const handleNewChat = async () => {
     const newSession = await createNewSession();
     if (newSession) {
-      setChatState({
+      // Add new session to the sessions list and set it as current
+      setChatState(prev => ({
+        ...prev,
         currentSession: newSession,
-        sessions: [],
+        sessions: [newSession, ...prev.sessions],
         messages: [{
           id: '1',
           type: 'system',
@@ -890,7 +981,112 @@ export const ChatUIDemo: React.FC = () => {
         isTyping: false,
         currentInput: '',
         connectionStatus: 'connected'
+      }));
+      
+      // Refresh sessions list to get latest from server
+      await loadAllSessions();
+    }
+  };
+
+  /**
+   * Load all sessions from OpenCode server
+   */
+  const loadAllSessions = async () => {
+    try {
+      const response = await opcClient.session.list();
+      
+      if (response.data) {
+        const sessions: OCPSession[] = response.data.map(session => ({
+          ...session,
+          title: session.title || 'Untitled Chat',
+          lastActivity: session.time?.updated ? new Date(session.time.updated * 1000) : new Date()
+        }));
+        
+        // Sort by last activity (most recent first)
+        sessions.sort((a, b) => {
+          const aTime = a.lastActivity?.getTime() || 0;
+          const bTime = b.lastActivity?.getTime() || 0;
+          return bTime - aTime;
+        });
+        
+        setChatState(prev => ({
+          ...prev,
+          sessions: sessions
+        }));
+      }
+    } catch (error) {
+      console.error('Failed to load sessions:', error);
+    }
+  };
+
+  /**
+   * Switch to a different session and load its messages
+   */
+  const handleSessionSelect = async (session: OCPSession) => {
+    try {
+      // Load messages for the selected session
+      const messages = await loadSessionMessages(session.id);
+      
+      setChatState(prev => ({
+        ...prev,
+        currentSession: session,
+        messages: messages.length > 0 ? messages : [{
+          id: 'welcome',
+          type: 'system',
+          content: 'Session loaded. Continue your conversation!',
+          timestamp: new Date(),
+          metadata: { sessionId: session.id }
+        }],
+        isTyping: false,
+        currentInput: ''
+      }));
+    } catch (error) {
+      console.error('Failed to switch session:', error);
+    }
+  };
+
+  /**
+   * Delete a session from OpenCode server
+   */
+  const handleSessionDelete = async (sessionId: string) => {
+    try {
+      const response = await opcClient.session.delete({
+        path: { id: sessionId }
       });
+      
+      if (response.data) {
+        // Remove from local state
+        setChatState(prev => {
+          const updatedSessions = prev.sessions.filter(s => s.id !== sessionId);
+          
+          // If we deleted the current session, switch to another or create new
+          if (prev.currentSession?.id === sessionId) {
+            if (updatedSessions.length > 0) {
+              // Switch to the first remaining session
+              handleSessionSelect(updatedSessions[0]);
+              return {
+                ...prev,
+                sessions: updatedSessions
+              };
+            } else {
+              // No sessions left, create a new one
+              handleNewChat();
+              return {
+                ...prev,
+                sessions: updatedSessions
+              };
+            }
+          }
+          
+          return {
+            ...prev,
+            sessions: updatedSessions
+          };
+        });
+      }
+    } catch (error) {
+      console.error('Failed to delete session:', error);
+      alert('Failed to delete session. Please try again.');
     }
   };
 
@@ -1062,6 +1258,11 @@ export const ChatUIDemo: React.FC = () => {
             <ChatSidebar 
               onNewChat={handleNewChat}
               onCollapse={handleSidebarCollapse}
+              sessions={chatState.sessions}
+              currentSessionId={chatState.currentSession?.id}
+              onSessionSelect={handleSessionSelect}
+              onSessionDelete={handleSessionDelete}
+              onRefresh={loadAllSessions}
             />
           </div>
         )}
@@ -1073,6 +1274,11 @@ export const ChatUIDemo: React.FC = () => {
               <ChatSidebar 
                 onNewChat={handleNewChat}
                 onCollapse={handleSidebarCollapse}
+                sessions={chatState.sessions}
+                currentSessionId={chatState.currentSession?.id}
+                onSessionSelect={handleSessionSelect}
+                onSessionDelete={handleSessionDelete}
+                onRefresh={loadAllSessions}
               />
             </div>
             <div 

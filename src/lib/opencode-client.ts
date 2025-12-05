@@ -1,18 +1,9 @@
 import { createOpencodeClient } from "@opencode-ai/sdk/client";
 
-// OpenCode client configuration with fallback options
+// OpenCode client configuration for remote server
 export const createOCPClient = () => {
-  // Determine the base URL based on environment
-  let baseUrl: string;
-  
-  // In browser, use relative URL to hit Next.js API routes (mock)
-  if (typeof window !== 'undefined') {
-    baseUrl = `${window.location.origin}/api`;
-  } 
-  // In server-side rendering, try OpenCode server
-  else {
-    baseUrl = process.env.OPENCODE_API_URL || "http://localhost:4096";
-  }
+  // Use the Cloudflare tunnel URL to connect to the OpenCode server
+  const baseUrl = "https://analyst-skirts-resolved-moved.trycloudflare.com";
     
   return createOpencodeClient({
     baseUrl,
