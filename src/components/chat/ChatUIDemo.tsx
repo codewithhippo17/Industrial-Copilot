@@ -648,28 +648,28 @@ export const MessageComposer: React.FC<{
   };
 
   return (
-    <div className="relative p-3 bg-white border-t border-[#E5E7EB]">
+    <div className="relative p-3 md:p-6 border-t border-[#E5E7EB]">
       {/* Context Panels */}
       <ContextPanel 
         isVisible={showContextPanels} 
         onCommandSelect={onCommandSelect}
       />
       
-      {/* ChatGPT-style Single Cell Input */}
-      <form onSubmit={handleSubmit} className="w-full">
+      {/* Simple ChatGPT-style Single Cell Input */}
+      <form onSubmit={handleSubmit} className="w-full max-w-4xl mx-auto">
         <div className={`
-          flex items-center gap-3 px-4 py-3 border rounded-xl transition-all duration-200 bg-white
-          ${isExpanded ? 'border-[#A3B087] ring-2 ring-[#A3B087] ring-opacity-20 shadow-sm' : 'border-[#E5E7EB] hover:border-[#A3B087]'}
+          flex items-center gap-3 px-4 py-3 border rounded-xl transition-colors duration-200 bg-white
+          ${isExpanded ? 'border-[#A3B087] shadow-sm' : 'border-[#E5E7EB] hover:border-[#A3B087]/50'}
           ${disabled ? 'opacity-50' : ''}
-          focus-within:border-[#A3B087] focus-within:ring-2 focus-within:ring-[#A3B087] focus-within:ring-opacity-20
+          focus-within:border-[#A3B087] focus-within:shadow-sm
         `}>
-          {/* Context Toggle Button - Integrated */}
+          {/* Context Toggle Button */}
           <button 
             type="button"
             onClick={toggleContextPanels}
-            className={`p-1.5 rounded-lg transition-all duration-200 flex items-center justify-center flex-shrink-0 ${
+            className={`p-2 rounded-lg transition-colors duration-200 flex items-center justify-center flex-shrink-0 ${
               showContextPanels 
-                ? 'bg-[#A3B087] text-white shadow-sm' 
+                ? 'bg-[#A3B087] text-white' 
                 : 'hover:bg-[#F3F4F6] text-[#435663]'
             }`}
             aria-label={showContextPanels ? "Hide context options" : "Show context options"}
@@ -677,12 +677,12 @@ export const MessageComposer: React.FC<{
           >
             <Icon 
               name={showContextPanels ? "minus" : "new-chat"} 
-              size={16} 
+              size={20} 
               color={showContextPanels ? 'inverse' : 'secondary'} 
             />
           </button>
 
-          {/* Input Field - Expanded */}
+          {/* Input Field */}
           <input
             ref={inputRef}
             type="text"
@@ -691,35 +691,35 @@ export const MessageComposer: React.FC<{
             onKeyDown={handleKeyDown}
             onFocus={() => setIsExpanded(true)}
             onBlur={() => setIsExpanded(false)}
-            placeholder={isTyping ? "Assistant is responding..." : "Message OCP Chat..."}
+            placeholder={isTyping ? "✨ Assistant is responding..." : "💬 Message OCP Chat..."}
             disabled={disabled || isTyping}
-            className="flex-1 text-[#313647] placeholder-[#9CA3AF] bg-transparent focus:outline-none text-base py-1"
+            className="flex-1 text-[#313647] placeholder-[#9CA3AF] bg-transparent focus:outline-none text-base"
           />
           
-          {/* Upload Button - Integrated */}
+          {/* Upload Button */}
           <button 
             type="button"
-            className="p-1.5 rounded-lg hover:bg-[#F3F4F6] transition-colors flex-shrink-0"
+            className="p-2 rounded-lg hover:bg-[#F3F4F6] transition-colors duration-200 flex-shrink-0"
             aria-label="Upload files"
             disabled={disabled}
           >
-            <Icon name="upload" size={16} color="secondary" />
+            <Icon name="upload" size={20} color="secondary" />
           </button>
           
-          {/* Send Button - Integrated */}
+          {/* Send Button */}
           <button 
             type="submit"
             disabled={!value.trim() || disabled || isTyping}
             className={`
-              p-1.5 rounded-lg transition-all duration-200 flex items-center justify-center flex-shrink-0
+              p-2 rounded-lg transition-colors duration-200 flex items-center justify-center flex-shrink-0
               ${value.trim() && !disabled && !isTyping
-                ? 'bg-[#A3B087] hover:bg-[#8B9474] text-white shadow-sm hover:shadow' 
+                ? 'bg-[#A3B087] hover:bg-[#8B9474] text-white' 
                 : 'bg-[#F3F4F6] text-[#9CA3AF] cursor-not-allowed'
               }
             `}
             aria-label="Send message"
           >
-            <Icon name="send" size={16} color={value.trim() && !disabled && !isTyping ? 'inverse' : 'muted'} />
+            <Icon name="send" size={20} color={value.trim() && !disabled && !isTyping ? 'inverse' : 'muted'} />
           </button>
         </div>
       </form>
@@ -770,8 +770,8 @@ export const ChatUIDemo: React.FC = () => {
           // Load all existing sessions
           await loadAllSessions();
           
-          // Auto-create first session if no sessions exist
-          await handleNewChat();
+          // Note: Don't auto-create a session on mount
+          // Let the user create one manually with the "New Chat" button
         } else {
           throw new Error('Failed to get config from OpenCode server');
         }
@@ -966,11 +966,10 @@ export const ChatUIDemo: React.FC = () => {
   const handleNewChat = async () => {
     const newSession = await createNewSession();
     if (newSession) {
-      // Add new session to the sessions list and set it as current
+      // Set the new session as current and clear messages
       setChatState(prev => ({
         ...prev,
         currentSession: newSession,
-        sessions: [newSession, ...prev.sessions],
         messages: [{
           id: '1',
           type: 'system',
@@ -983,7 +982,7 @@ export const ChatUIDemo: React.FC = () => {
         connectionStatus: 'connected'
       }));
       
-      // Refresh sessions list to get latest from server
+      // Refresh sessions list from server (this will include the newly created session)
       await loadAllSessions();
     }
   };
