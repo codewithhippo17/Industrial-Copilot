@@ -1,182 +1,381 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Icon } from '@/components/ui';
+import { CriticalSteamGauge, GTAFleet, EnergySourceBar, PressureHeartbeat, ActionFeed } from '@/components/monitoring';
+import { useLiveData } from '@/lib/api';
 
 /**
- * Dashboard Header Component - Using same design as ChatHeader
+ * Energy Copilot - High-Density Industrial Control Room
+ * 
+ * SCADA-style interface with:
+ * - Live Asset Synoptic (Critical Steam Gauge + GTA Fleet)
+ * - Real-time pressure stability monitoring
+ * - Energy source mix visualization
+ * - Live event feed with AI insights
  */
-const DashboardHeader: React.FC<{ 
-  onChat?: () => void;
-  onWorkspace?: () => void;
-  onSettings?: () => void;
-}> = ({ onChat, onWorkspace, onSettings }) => {
+
+const ControlRoomHeader: React.FC<{
+  onOptimize?: () => void;
+  costRate: number;
+  efficiency: number;
+  pressure: number;
+  blendedCost: number;
+}> = ({ onOptimize, costRate, efficiency, pressure, blendedCost }) => {
+  const isPressureCritical = pressure < 8.5;
+  const isEfficiencyGood = efficiency > 85;
+
   return (
-    <header className="flex items-center justify-between px-4 py-2.5 bg-[#313647] text-[#FFF8D4] shadow-sm border-b border-[#435663]">
-      <div className="flex items-center gap-3">
+    <header className="h-16 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 px-6 flex items-center justify-between">
+      {/* Left: Branding */}
+      <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 bg-[#A3B087] rounded-full flex items-center justify-center">
+          <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-blue-600 rounded-lg flex items-center justify-center">
             <Icon name="dashboard-tab" size={16} color="inverse" />
           </div>
-          <span className="text-base font-semibold">OCP Dashboard</span>
+          <div>
+            <h1 className="text-sm font-bold text-slate-100">Energy Copilot</h1>
+            <p className="text-[10px] text-slate-500">Industrial Control Room</p>
+          </div>
         </div>
-        
-        {/* Chat and Workspace buttons */}
-        <div className="flex items-center gap-1">
-          <button 
-            onClick={onChat}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors rounded-lg text-[#FFF8D4] hover:bg-[#435663] hover:text-white"
-            aria-label="Chat"
-          >
-            <Icon name="agent-selector" size={16} color="inverse" />
-            <span>Chat</span>
-          </button>
-          <button 
-            onClick={onWorkspace}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors rounded-lg text-[#FFF8D4] hover:bg-[#435663] hover:text-white"
-            aria-label="Workspace"
-          >
-            <Icon name="workspace" size={16} color="inverse" />
-            <span>Workspace</span>
-          </button>
+
+        <div className="h-6 w-px bg-slate-700" />
+
+        <button
+          onClick={onOptimize}
+          className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium transition-all rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700 hover:border-emerald-500"
+        >
+          <Icon name="settings" size={16} color="primary" />
+          <span>Optimize</span>
+        </button>
+      </div>
+
+      {/* Center: Global KPIs */}
+      <div className="flex items-center gap-6">
+        {/* Cost Rate */}
+        <div className="flex flex-col items-center">
+          <div className="text-[10px] text-slate-500 uppercase tracking-wide mb-0.5">Cost Rate</div>
+          <div className="text-2xl font-mono font-bold text-white">
+            {(costRate / 1000).toFixed(0)}
+            <span className="text-xs text-slate-500 ml-1">k DH/h</span>
+          </div>
+        </div>
+
+        <div className="h-10 w-px bg-slate-800" />
+
+        {/* Blended Steam Cost */}
+        <div className="flex flex-col items-center">
+          <div className="text-[10px] text-slate-500 uppercase tracking-wide mb-0.5">Steam Cost</div>
+          <div className={`text-2xl font-mono font-bold ${blendedCost < 100 ? 'text-emerald-400' : 'text-amber-400'}`}>
+            {blendedCost.toFixed(0)}
+            <span className="text-xs text-slate-500 ml-1">DH/T</span>
+          </div>
+        </div>
+
+        <div className="h-10 w-px bg-slate-800" />
+
+        {/* Efficiency */}
+        <div className="flex flex-col items-center">
+          <div className="text-[10px] text-slate-500 uppercase tracking-wide mb-0.5">Efficiency</div>
+          <div className={`text-2xl font-mono font-bold ${isEfficiencyGood ? 'text-emerald-400' : 'text-amber-400'}`}>
+            {efficiency.toFixed(1)}
+            <span className="text-xs text-slate-500 ml-1">%</span>
+          </div>
+        </div>
+
+        <div className="h-10 w-px bg-slate-800" />
+
+        {/* MP Pressure */}
+        <div className="flex flex-col items-center">
+          <div className="text-[10px] text-slate-500 uppercase tracking-wide mb-0.5">MP Pressure</div>
+          <div className={`text-2xl font-mono font-bold ${
+            isPressureCritical ? 'text-rose-400 animate-pulse' : 
+            pressure < 9.0 ? 'text-amber-400' : 
+            'text-emerald-400'
+          }`}>
+            {pressure.toFixed(2)}
+            <span className="text-xs text-slate-500 ml-1">bar</span>
+          </div>
         </div>
       </div>
-      
-      <div className="flex items-center gap-2">
-        {/* Mobile Layout - Compact dropdowns */}
-        <div className="flex sm:hidden items-center gap-1">
-          <button className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-[#435663] hover:bg-[#A3B087] transition-all duration-200 group">
-            <Icon name="agent-selector" size={16} color="inverse" />
-            <Icon name="dropdown" size={16} color="inverse" className="group-hover:rotate-180 transition-transform" />
-          </button>
-          
-          <button className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-[#435663] hover:bg-[#A3B087] transition-all duration-200 group">
-            <div className="w-3 h-3 bg-gradient-to-br from-[#A3B087] to-[#313647] rounded-sm flex items-center justify-center">
-              <span className="text-[7px] font-bold text-white">AI</span>
-            </div>
-            <Icon name="dropdown" size={16} color="inverse" className="group-hover:rotate-180 transition-transform" />
-          </button>
+
+      {/* Right: Status */}
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/30 rounded-lg">
+          <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="text-xs font-medium text-emerald-400">Live</span>
         </div>
-        
-        <div className="flex items-center gap-0.5">
-          <button 
-            onClick={onSettings}
-            className="p-1.5 rounded-md hover:bg-[#435663] transition-colors"
-            aria-label="Dashboard settings"
-          >
-            <Icon name="settingsprimary" size={20} color="inverse" />
-          </button>
-          <button 
-            onClick={onSettings}
-            className="p-1.5 rounded-md hover:bg-[#435663] transition-colors"
-            aria-label="Share dashboard"
-          >
-            <Icon name="sharecream" size={20} color="inverse" />
-          </button>
+        <div className="text-[10px] text-slate-600 font-mono">
+          {new Date().toLocaleTimeString()}
         </div>
       </div>
     </header>
   );
 };
 
-/**
- * Dashboard Main Content Component
- */
-const DashboardContent: React.FC = () => {
-  return (
-    <div className="flex-1 bg-[#FFF8D4] p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Empty dashboard placeholder */}
-        <div className="bg-white rounded-lg border border-[#435663]/20 p-8 text-center">
-          <div className="w-16 h-16 bg-[#A3B087]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Icon name="dashboard-tab" size={32} color="primary" />
-          </div>
-          <h2 className="text-2xl font-semibold text-[#313647] mb-2">
-            Welcome to Your Dashboard
-          </h2>
-          <p className="text-[#435663] mb-6 max-w-md mx-auto">
-            Your dashboard is ready for customization. Start by adding charts, visualizations, and widgets to track your data.
-          </p>
-          
-          {/* Quick action buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <button className="flex items-center gap-2 px-6 py-3 bg-[#A3B087] text-white rounded-lg font-medium hover:bg-[#A3B087]/90 transition-colors">
-              <Icon name="add" size={20} color="inverse" />
-              <span>Add Chart</span>
-            </button>
-            <button className="flex items-center gap-2 px-6 py-3 border border-[#A3B087] text-[#A3B087] rounded-lg font-medium hover:bg-[#A3B087]/5 transition-colors">
-              <Icon name="workspace" size={20} color="accent" />
-              <span>Browse Templates</span>
-            </button>
-          </div>
+export default function ControlRoomDashboard() {
+  const { liveData, isLoading, error, refresh } = useLiveData(5000);
+
+  const handleNavigateToOptimize = () => {
+    window.location.href = '/optimize';
+  };
+
+  // Calculate KPIs
+  const calculateCostRate = () => {
+    if (!liveData) return 0;
+    return liveData.cost_per_hour;
+  };
+
+  const calculateBlendedCost = () => {
+    if (!liveData) return 0;
+    return liveData.steam_economics?.blended_cost_per_ton || 0;
+  };
+
+  const getEfficiency = () => {
+    if (!liveData) return 0;
+    return liveData.efficiency_percent;
+  };
+
+  const getPressure = () => {
+    if (!liveData || !liveData.mp_pressure) return 8.5;
+    return liveData.mp_pressure;
+  };
+
+  if (isLoading && !liveData) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-slate-950">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-slate-400">Initializing Control Room...</p>
         </div>
-        
-        {/* Future dashboard sections placeholder */}
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Chart placeholders */}
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="bg-white rounded-lg border border-[#435663]/20 p-4 h-48">
-              <div className="w-full h-full bg-[#A3B087]/5 rounded flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-8 h-8 bg-[#A3B087]/20 rounded mx-auto mb-2 flex items-center justify-center">
-                    <Icon name="dashboard-tab" size={16} color="accent" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-screen flex flex-col bg-slate-950 text-slate-100">
+      {/* Top Bar - Fixed 64px */}
+      <ControlRoomHeader
+        onOptimize={handleNavigateToOptimize}
+        costRate={calculateCostRate()}
+        efficiency={getEfficiency()}
+        pressure={getPressure()}
+        blendedCost={calculateBlendedCost()}
+      />
+
+      {/* Main Content - Dense Grid */}
+      <div className="flex-1 p-4 overflow-hidden">
+        <div className="h-full grid grid-cols-12 gap-4">
+          
+          {/* LEFT PANEL: Live Asset Synoptic (Cols 1-9) */}
+          <div className="col-span-9 grid grid-rows-[1fr_auto] gap-4">
+            
+            {/* ROW 1: Steam Monitor (4 cols) + GTA Fleet (8 cols) */}
+            <div className="grid grid-cols-12 gap-4">
+              
+              {/* Critical Steam Gauge */}
+              <div className="col-span-4">
+                {liveData ? (
+                  <CriticalSteamGauge
+                    pressure={liveData.mp_pressure || 8.5}
+                    minValue={0}
+                    maxValue={15}
+                    criticalThreshold={8.5}
+                  />
+                ) : (
+                  <div className="bg-slate-900/50 rounded-lg border border-slate-800 h-full flex items-center justify-center">
+                    <p className="text-slate-500 text-sm">Loading gauge...</p>
                   </div>
-                  <p className="text-sm text-[#435663]">Chart {i}</p>
+                )}
+              </div>
+
+              {/* GTA Fleet Status */}
+              <div className="col-span-8">
+                {liveData ? (
+                  <GTAFleet
+                    gta1={{
+                      name: 'GTA 1',
+                      power: liveData.gta_operations.gta1.power,
+                      steam: liveData.gta_operations.gta1.soutirage,
+                      admission: liveData.gta_operations.gta1.admission,
+                      status: liveData.gta_operations.gta1.power > 1 ? 'ON' : 'OFF'
+                    }}
+                    gta2={{
+                      name: 'GTA 2',
+                      power: liveData.gta_operations.gta2.power,
+                      steam: liveData.gta_operations.gta2.soutirage,
+                      admission: liveData.gta_operations.gta2.admission,
+                      status: liveData.gta_operations.gta2.power > 1 ? 'ON' : 'OFF'
+                    }}
+                    gta3={{
+                      name: 'GTA 3',
+                      power: liveData.gta_operations.gta3.power,
+                      steam: liveData.gta_operations.gta3.soutirage,
+                      admission: liveData.gta_operations.gta3.admission,
+                      status: liveData.gta_operations.gta3.power > 1 ? 'ON' : 'OFF'
+                    }}
+                  />
+                ) : (
+                  <div className="bg-slate-900/50 rounded-lg border border-slate-800 h-full flex items-center justify-center">
+                    <p className="text-slate-500 text-sm">Loading GTA fleet...</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* ROW 2: Energy Source Mix (Full Width) */}
+            {liveData && (
+              <EnergySourceBar
+                sulfurSteam={liveData.steam_economics?.source_breakdown.sulfur_tons || 0}
+                gtaSteam={liveData.steam_economics?.source_breakdown.gta_tons || 0}
+                boilerSteam={liveData.steam_economics?.source_breakdown.boiler_tons || 0}
+              />
+            )}
+          </div>
+
+          {/* RIGHT PANEL: Status & Alerts (Cols 10-12) */}
+          <div className="col-span-3 space-y-4 overflow-y-auto">
+            
+            {/* Pressure Heartbeat */}
+            {liveData && (
+              <PressureHeartbeat
+                currentPressure={liveData.mp_pressure || 8.5}
+                criticalThreshold={8.5}
+              />
+            )}
+
+            {/* GTA Status Compact */}
+            <div className="bg-slate-900/50 backdrop-blur-md border border-slate-800 rounded-lg p-3">
+              <div className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">
+                Power Generation
+              </div>
+              <div className="space-y-2">
+                {/* GTA 1 */}
+                <div className="flex items-center justify-between p-2 bg-slate-800/50 rounded">
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="text-xs text-slate-400">GTA 1</span>
+                  </div>
+                  <div className="text-sm font-mono font-bold text-blue-400">
+                    {liveData?.gta_operations.gta1.power.toFixed(1) || '0.0'}
+                    <span className="text-[10px] text-slate-500 ml-1">MW</span>
+                  </div>
+                </div>
+
+                {/* GTA 2 */}
+                <div className="flex items-center justify-between p-2 bg-slate-800/50 rounded">
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="text-xs text-slate-400">GTA 2</span>
+                  </div>
+                  <div className="text-sm font-mono font-bold text-blue-400">
+                    {liveData?.gta_operations.gta2.power.toFixed(1) || '0.0'}
+                    <span className="text-[10px] text-slate-500 ml-1">MW</span>
+                  </div>
+                </div>
+
+                {/* GTA 3 */}
+                <div className="flex items-center justify-between p-2 bg-slate-800/50 rounded">
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="text-xs text-slate-400">GTA 3</span>
+                  </div>
+                  <div className="text-sm font-mono font-bold text-blue-400">
+                    {liveData?.gta_operations.gta3.power.toFixed(1) || '0.0'}
+                    <span className="text-[10px] text-slate-500 ml-1">MW</span>
+                  </div>
+                </div>
+
+                {/* Total */}
+                <div className="flex items-center justify-between p-2 bg-emerald-500/10 rounded border border-emerald-500/30 mt-2">
+                  <span className="text-xs font-semibold text-emerald-400">Total</span>
+                  <div className="text-lg font-mono font-bold text-emerald-400">
+                    {liveData?.total_power_generated.toFixed(1) || '0.0'}
+                    <span className="text-[10px] ml-1">MW</span>
+                  </div>
                 </div>
               </div>
             </div>
-          ))}
+
+            {/* Steam Economics Compact */}
+            <div className="bg-slate-900/50 backdrop-blur-md border border-slate-800 rounded-lg p-3">
+              <div className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">
+                Steam Source Mix
+              </div>
+              {liveData && (
+                <div className="space-y-2">
+                  {/* Sulfur (Free) */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                      <span className="text-xs text-slate-400">Sulfur (Free)</span>
+                    </div>
+                    <div className="text-xs font-mono font-bold text-emerald-400">
+                      {liveData.steam_economics?.source_breakdown.sulfur_percent.toFixed(0)}%
+                    </div>
+                  </div>
+
+                  {/* GTA Extraction */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-blue-500" />
+                      <span className="text-xs text-slate-400">GTA Extract</span>
+                    </div>
+                    <div className="text-xs font-mono font-bold text-blue-400">
+                      {liveData.steam_economics?.source_breakdown.gta_percent.toFixed(0)}%
+                    </div>
+                  </div>
+
+                  {/* Boiler (Expensive) */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-rose-500" />
+                      <span className="text-xs text-slate-400">Boiler (284 DH/T)</span>
+                    </div>
+                    <div className={`text-xs font-mono font-bold ${
+                      liveData.steam_economics?.source_breakdown.boiler_percent > 0 ? 'text-rose-400' : 'text-slate-600'
+                    }`}>
+                      {liveData.steam_economics?.source_breakdown.boiler_percent.toFixed(0)}%
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Action Feed */}
+            {liveData && (
+              <div className="h-[calc(100vh-650px)] min-h-[300px]">
+                <ActionFeed
+                  mpPressure={liveData.mp_pressure || 8.5}
+                  boilerActive={liveData.boiler_usage_estimated > 0}
+                  gridImport={liveData.grid_import_estimated}
+                  efficiency={liveData.efficiency_percent}
+                  blendedCost={liveData.steam_economics?.blended_cost_per_ton || 0}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Error Display */}
+          {error && (
+            <div className="col-span-12 bg-rose-500/10 border border-rose-500/30 rounded-lg p-3">
+              <div className="flex items-start gap-2">
+                <div className="text-rose-400 text-sm">⚠️</div>
+                <div>
+                  <div className="text-rose-400 font-semibold text-sm">Connection Error</div>
+                  <div className="text-rose-300 text-xs mt-1">{error}</div>
+                  <button
+                    onClick={refresh}
+                    className="mt-2 text-xs text-rose-400 underline hover:text-rose-300"
+                  >
+                    Retry Connection
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
-    </div>
-  );
-};
-
-/**
- * Main Dashboard Page Component
- */
-export default function DashboardPage() {
-  const [notifications] = useState<string[]>([]);
-
-  // Navigation handlers
-  const handleChatNavigation = () => {
-    window.location.href = '/test/chat';
-  };
-
-  const handleWorkspaceNavigation = () => {
-    window.location.href = '/workspace';
-  };
-
-  const handleSettingsNavigation = () => {
-    console.log('Open Dashboard Settings');
-    // TODO: Implement settings modal/page
-  };
-
-  return (
-    <div className="h-screen flex flex-col bg-[#FFF8D4]">
-      {/* Dashboard Header */}
-      <DashboardHeader 
-        onChat={handleChatNavigation}
-        onWorkspace={handleWorkspaceNavigation}
-        onSettings={handleSettingsNavigation}
-      />
-      
-      {/* Main Dashboard Content */}
-      <DashboardContent />
-      
-      {/* Notification system (future enhancement) */}
-      {notifications.length > 0 && (
-        <div className="fixed bottom-4 right-4 z-50">
-          {notifications.map((notification, index) => (
-            <div 
-              key={index}
-              className="bg-[#A3B087] text-white px-4 py-2 rounded-lg shadow-lg mb-2"
-            >
-              {notification}
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
 }
