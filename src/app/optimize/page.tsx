@@ -87,7 +87,7 @@ const EmptyState: React.FC = () => {
     <div className="h-full flex items-center justify-center bg-slate-900 rounded-lg border border-slate-800">
       <div className="text-center max-w-md">
         <div className="w-20 h-20 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-slate-700">
-          <Icon name="chart" size={40} color="primary" />
+          <Icon name="settings" size={32} color="primary" />
         </div>
         <h3 className="text-2xl font-bold text-white mb-3">
           Ready for Simulation
@@ -97,15 +97,15 @@ const EmptyState: React.FC = () => {
         </p>
         <div className="flex items-center justify-center gap-4 text-sm text-slate-500">
           <div className="flex items-center gap-2">
-            <Icon name="checkmark" size={16} color="primary" />
+            <Icon name="star" size={16} color="primary" />
             <span>Financial Impact</span>
           </div>
           <div className="flex items-center gap-2">
-            <Icon name="chart" size={16} color="primary" />
+            <Icon name="dot" size={16} color="primary" />
             <span>Source Mix</span>
           </div>
           <div className="flex items-center gap-2">
-            <Icon name="list" size={16} color="primary" />
+            <Icon name="commands" size={16} color="primary" />
             <span>Action Plan</span>
           </div>
         </div>
@@ -201,7 +201,7 @@ export default function SimulationLab() {
               <div className="h-full flex items-center justify-center bg-slate-900 rounded-lg border border-rose-500/30">
                 <div className="text-center max-w-md">
                   <div className="w-16 h-16 bg-rose-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Icon name="error" size={32} color="secondary" />
+                    <Icon name="minus" size={32} color="secondary" />
                   </div>
                   <h3 className="text-xl font-bold text-white mb-2">Simulation Failed</h3>
                   <p className="text-rose-400 text-sm">{error}</p>

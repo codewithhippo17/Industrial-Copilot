@@ -875,7 +875,7 @@ export const ChatUIDemo: React.FC = () => {
       const userInput = chatState.currentInput;
 
       // Send message to OpenCode using correct endpoint
-      const baseUrl = "https://analyst-skirts-resolved-moved.trycloudflare.com";
+      const baseUrl = process.env.NEXT_PUBLIC_OPENCODE_SERVER_URL?.replace(/\/$/, '') || "https://responsible-casey-degrees-mall.trycloudflare.com";
         
       const messagePayload = {
         model: chatState.currentModel || { 
