@@ -7,7 +7,7 @@ export const createOCPClient = () => {
   
   // In browser, use relative URL to hit Next.js API routes (mock)
   if (typeof window !== 'undefined') {
-    baseUrl = window.location.origin;
+    baseUrl = `${window.location.origin}/api`;
   } 
   // In server-side rendering, try OpenCode server
   else {

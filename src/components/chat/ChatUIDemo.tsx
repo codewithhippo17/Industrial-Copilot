@@ -391,7 +391,7 @@ const ContextPanel: React.FC<{
   isVisible: boolean;
   onCommandSelect?: (command: MCPCommand, server: string) => void;
 }> = ({ isVisible, onCommandSelect }) => {
-  const [activeTab, setActiveTab] = useState<'files' | 'commands' | 'agents' | 'tabs' | 'workspace'>('files');
+  const [activeTab, setActiveTab] = useState<'files' | 'commands' | 'tabs' | 'workspace'>('files');
   
   // Selection state management for tabs with radio-style selection
   const [selectedDashboard, setSelectedDashboard] = useState<string>('Energy Dashboard');
@@ -406,7 +406,6 @@ const ContextPanel: React.FC<{
         {[
           { id: 'files', label: 'Files', icon: 'files' },
           { id: 'commands', label: 'Commands', icon: 'commands' },
-          { id: 'agents', label: 'Agents', icon: 'agent-selector' },
           { id: 'tabs', label: 'Dashboard', icon: 'dashboard-tab' },
           { id: 'workspace', label: 'Workspace', icon: 'workspace' },
         ].map((tab) => (
@@ -457,32 +456,6 @@ const ContextPanel: React.FC<{
             onCommandSelect={onCommandSelect}
             className="h-full -m-4"
           />
-        )}
-
-        {activeTab === 'agents' && (
-          <div>
-            <div className="text-sm font-medium text-[#313647] mb-3">Available Agents</div>
-            <div className="flex border-b border-[#E5E7EB] bg-[#F9FAFB]">
-              {[
-                { name: 'Data Analyst', active: true },
-                { name: 'Energy Expert', active: false },
-                { name: 'Business Strategist', active: false },
-                { name: 'Technical Writer', active: false },
-              ].map((agent) => (
-                <button
-                  key={agent.name}
-                  className={`flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors ${
-                    agent.active
-                      ? 'bg-[#A3B087] text-white border-b-2 border-[#A3B087]'
-                      : 'text-[#435663] hover:bg-[#E5E7EB] hover:text-[#313647]'
-                  }`}
-                >
-                  <Icon name="agent-selector" size={16} color={agent.active ? 'inverse' : 'secondary'} />
-                  {agent.name}
-                </button>
-              ))}
-            </div>
-          </div>
         )}
 
         {activeTab === 'tabs' && (
