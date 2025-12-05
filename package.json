@@ -14,13 +14,17 @@
   },
   "dependencies": {
     "@opencode-ai/sdk": "^1.0.132",
+    "@nivo/core": "^0.99.0",
+    "@nivo/sankey": "^0.99.0",
     "autoprefixer": "^10.4.16",
+    "axios": "^1.6.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "next": "14.0.0",
     "postcss": "^8.4.31",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "recharts": "^2.10.3",
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^3.3.0"
   },
