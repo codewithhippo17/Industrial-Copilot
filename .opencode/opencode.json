@@ -1,0 +1,38 @@
+{
+  "mcpServers": {
+    "energy-copilot": {
+      "command": "python",
+      "args": ["mcp-servers/energy-copilot/server.py"],
+      "cwd": "/home/_hippo/dev/ocp",
+      "env": {
+        "ENERGY_COPILOT_API_URL": "http://localhost:8000"
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "optimize_energy",
+      "server": "energy-copilot"
+    },
+    {
+      "name": "get_system_info", 
+      "server": "energy-copilot"
+    },
+    {
+      "name": "get_scenarios",
+      "server": "energy-copilot"
+    },
+    {
+      "name": "get_live_data",
+      "server": "energy-copilot"
+    },
+    {
+      "name": "check_health",
+      "server": "energy-copilot"
+    },
+    {
+      "name": "get_api_info",
+      "server": "energy-copilot"
+    }
+  ]
+}
