@@ -32,14 +32,18 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# CORS Configuration - Allow Next.js frontend
+# CORS Configuration - Allow Next.js frontend and Cloudflare tunnels
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",
         "http://localhost:3001",
         "http://127.0.0.1:3000",
-        "http://127.0.0.1:3001"
+        "http://127.0.0.1:3001",
+        # Cloudflare tunnel support
+        "https://*.trycloudflare.com",
+        # Add specific tunnel URL if you have one
+        # "https://stereo-wagon-memory-suddenly.trycloudflare.com",
     ],
     allow_credentials=True,
     allow_methods=["*"],
